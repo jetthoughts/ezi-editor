@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ezi-editor</title>
+    <style>
+        #pad-container {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            bottom: 24px;
+            left: 24px;
+        }
+
+        #pad {
+            font: 16px/1.2 sans-serif;
+            padding: 4px 7px;
+            height: 100%;
+            width: 100%;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="pad-container">
+        <textarea id="pad" autofocus></textarea>
+    </div>
+
+    <script src="/pad.js"></script>
+    <script>
+        var pad = document.getElementById('pad');
+
+        var eziPad = new EziPad({
+            roomId: 'home',
+            onInitialContent: function(content) {
+                pad.value = content;
+            },
+            onTextUpdated: function(newText, transformCursor) {
+                var start = pad.selectionStart;
+                var end = pad.selectionEnd;
+                var scrollTop = pad.scrollTop;
+                pad.value = newText;
+                if (pad.scrollTop !== scrollTop) {
+                    pad.scrollTop = scrollTop;
+                }
+
+                if (document.activeElement === pad) {
+                    pad.selectionStart = transformCursor(start);
+                    pad.selectionEnd = transformCursor(end);
+                }
+            }
+        });
+        pad.addEventListener('input', function() {
+            setTimeout(function(){
+                eziPad.updateInput(pad.value);
+            }, 0);
+        }, false);
+    </script>
+</body>
+
+</html>
