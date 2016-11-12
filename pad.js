@@ -20,7 +20,7 @@ function EziPad(options) {
 
 EziPad.prototype.getRoomData = function(room) {
   var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open( "GET", this.options.backendUrl + '/rooms/' + room, false);
+  xmlHttp.open( "GET", (this.options.backendUrl || '') + '/rooms/' + room, false);
   xmlHttp.send( null );
   return xmlHttp.responseText;
 }

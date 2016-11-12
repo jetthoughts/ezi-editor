@@ -1,6 +1,7 @@
 var fs = require('fs');
 var http = require('http');
 var express = require('express');
+var bodyParser = require('body-parser');
 var racerBrowserChannel = require('racer-browserchannel');
 var racer = require('racer');
 racer.use(require('racer-bundle'));
@@ -10,10 +11,13 @@ var backend = racer.createBackend();
 app = express();
 app
   .use(
+    bodyParser.urlencoded({ extended: false })
+  )
+  .use(
     racerBrowserChannel(
       backend,
       { headers: { 'Access-Control-Allow-Origin': '*' } },
-      { base: process.env.URL + '/channel' }
+      { base: (process.env.URL || '') + '/channel' }
     )
   )
   .use(backend.modelMiddleware());
@@ -69,7 +73,35 @@ app.get('/rooms/:roomId', function(req, res, next) {
     $room.createNull({content: ''});
     // Reference the current room's content for ease of use
     model.ref('_page.room', $room.at('content'));
+    model.bundle(function (err, bundle) {
+      if (err) return next(err);
+      var bundleJson = stringifyBundle(bundle);
+      res.send(bundleJson);
+    });
+  });
+});
+
+app.post('/rooms/:roomId', function(req, res, next) {
+  var model = req.model;
+  // Only handle URLs that use alphanumberic characters, underscores, and dashes
+  if (!/^[a-zA-Z0-9_-]+$/.test(req.params.roomId)) return next();
+  // Prevent the browser from storing the HTML response in its back cache, since
+  // that will cause it to render with the data from the initial load first
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  var content = req.body.content;
+  var $room = model.at('rooms.' + req.params.roomId);
+  // Subscribe is like a fetch but it also listens for updates
+  $room.subscribe(function (err) {
+    if (err) return next(err);
+    var room = $room.get();
+    // If the room doesn't exist yet, we need to create it
+    $room.createNull({content: content});
+    // Reference the current room's content for ease of use
     model.ref('_page.room', $room.at('content'));
+    model.set('content', content);
+
     model.bundle(function (err, bundle) {
       if (err) return next(err);
       var bundleJson = stringifyBundle(bundle);
