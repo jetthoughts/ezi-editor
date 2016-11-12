@@ -1,7 +1,6 @@
 var fs = require('fs');
 var http = require('http');
 var express = require('express');
-var handlebars = require('handlebars');
 var racerBrowserChannel = require('racer-browserchannel');
 var racer = require('racer');
 racer.use(require('racer-bundle'));

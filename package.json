@@ -1,7 +1,7 @@
 {
   "name": "ezi-editor",
   "description": "Code Editor for ez-interview",
-  "version": "0.1",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/jetthoughts/ezi-editor.git"
@@ -9,7 +9,6 @@
   "dependencies": {
     "coffeeify": "^2.0.1",
     "express": "^4.14.0",
-    "handlebars": "^4.0.5",
     "racer": "^0.9.0",
     "racer-browserchannel": "^0.5.0",
     "racer-bundle": "^0.2.5",
