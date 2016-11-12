@@ -1,10 +1,10 @@
 var racer = require('racer');
 
 function EziPad(options) {
+  this.options = options;
   var roomId = options.roomId;
   var data = JSON.parse(this.getRoomData(roomId));
   var rootModel = racer.createModel(data);
-  this.options = options;
   this.rootModel = rootModel;
 
   var model = rootModel.at('_page.room');
@@ -20,7 +20,7 @@ function EziPad(options) {
 
 EziPad.prototype.getRoomData = function(room) {
   var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open( "GET", '/rooms/' + room, false);
+  xmlHttp.open( "GET", this.options.backendUrl + '/rooms/' + room, false);
   xmlHttp.send( null );
   return xmlHttp.responseText;
 }
@@ -94,4 +94,3 @@ EziPad.prototype.updateInput = function(value) {
 }
 
 window.EziPad = EziPad;
-

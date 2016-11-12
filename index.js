@@ -9,7 +9,13 @@ var backend = racer.createBackend();
 
 app = express();
 app
-  .use(racerBrowserChannel(backend))
+  .use(
+    racerBrowserChannel(
+      backend,
+      { headers: { 'Access-Control-Allow-Origin': '*' } },
+      { base: process.env.URL + '/channel' }
+    )
+  )
   .use(backend.modelMiddleware());
 
 app.use(function (err, req, res, next) {
@@ -52,6 +58,7 @@ app.get('/rooms/:roomId', function(req, res, next) {
   // Prevent the browser from storing the HTML response in its back cache, since
   // that will cause it to render with the data from the initial load first
   res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Access-Control-Allow-Origin', '*');
 
   var $room = model.at('rooms.' + req.params.roomId);
   // Subscribe is like a fetch but it also listens for updates
