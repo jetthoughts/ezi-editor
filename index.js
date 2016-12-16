@@ -100,7 +100,7 @@ app.post('/rooms/:roomId', function(req, res, next) {
     $room.createNull({content: content});
     // Reference the current room's content for ease of use
     model.ref('_page.room', $room.at('content'));
-    model.set('content', content);
+    model.set('_page.room', content);
 
     model.bundle(function (err, bundle) {
       if (err) return next(err);
