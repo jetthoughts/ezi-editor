@@ -81,6 +81,24 @@ app.get('/rooms/:roomId', function(req, res, next) {
   });
 });
 
+app.get('/rooms/:roomId/content', function(req, res, next) {
+  var model = req.model;
+  // Only handle URLs that use alphanumberic characters, underscores, and dashes
+  if (!/^[a-zA-Z0-9_-]+$/.test(req.params.roomId)) return next();
+  // Prevent the browser from storing the HTML response in its back cache, since
+  // that will cause it to render with the data from the initial load first
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  var $room = model.at('rooms.' + req.params.roomId);
+
+  $room.fetch(function (err) {
+    if (err) return next(err);
+    result = model.get($room.at('content'));
+    res.send(result);
+  });
+});
+
 app.post('/rooms/:roomId', function(req, res, next) {
   var model = req.model;
   // Only handle URLs that use alphanumberic characters, underscores, and dashes
